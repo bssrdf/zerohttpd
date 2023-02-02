@@ -14,7 +14,13 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#ifdef LINUX
 #include <sys/sendfile.h>
+#endif
+#ifdef MACOSX
+#include <sys/uio.h>
+#endif
+
 #include <time.h>
 #include <locale.h>
 
@@ -404,9 +410,18 @@ void handle_http_404(int client_socket) {
 
 void transfer_file_contents(char *file_path, int client_socket, off_t file_size) {
     int fd;
+#ifdef MACOSX
+	off_t len = 0;
+#endif	
 
     fd = open(file_path, O_RDONLY);
+#ifdef LINUX 	
     sendfile(client_socket, fd, NULL, file_size);
+#endif	
+#ifdef MACOSX
+    sendfile(fd, client_socket, (off_t)0, &len, NULL, 0);
+#endif
+
     close(fd);
 }
 

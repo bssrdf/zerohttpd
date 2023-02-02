@@ -1,5 +1,20 @@
+ifeq ($(OS),Windows_NT)
+    uname_S := Windows
+else
+    uname_S := $(shell uname -s)
+endif
+ifeq ($(uname_S),Linux)
+    CFLAGS = -Wall -DLINUX 
+    LDLIBS = -levent -L/home/isodden/work/libevent/.libs
+endif
+ifeq ($(uname_S),Darwin)
+    CFLAGS = -Wall -DMACOSX
+    LDLIBS = -levent -L/Users/shanshan/work/libevent/.libs
+endif
+
+
 iterative: 01_iterative/main.c
-		gcc -o $@ $<
+		gcc -o $@ ${CFLAGS} $<
 
 forking: 02_forking/main.c
 		gcc -o $@ $<
